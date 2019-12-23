@@ -156,6 +156,7 @@ namespace PuppeteerSharp.Transport
         private async Task<object> GetResponseAsync(CancellationToken cancellationToken)
         {
             var buffer = new byte[2048];
+            var lastQueuedTask = Task.CompletedTask;
 
             while (!IsClosed)
             {
@@ -194,10 +195,16 @@ namespace PuppeteerSharp.Transport
                     }
                 }
 
-                MessageReceived?.Invoke(this, new MessageReceivedEventArgs(response.ToString()));
+                QueueOrderedTask(
+                    (_, state) => MessageReceived?.Invoke(this, new MessageReceivedEventArgs(state.ToString())),
+                    state: response
+                );
             }
 
             return null;
+
+            void QueueOrderedTask(Action<Task, object> action, object state) => lastQueuedTask = lastQueuedTask
+                .ContinueWith(action, state, CancellationToken.None, TaskContinuationOptions.RunContinuationsAsynchronously, TaskScheduler.Default);
         }
 
         private void OnClose(string closeReason)
