@@ -2420,7 +2420,7 @@ namespace PuppeteerSharp
         /// <see cref="Dispose"/> method leaves the <see cref="Page"/> in an unusable state. After
         /// calling <see cref="Dispose"/>, you must release all references to the <see cref="Page"/> so
         /// the garbage collector can reclaim the memory that the <see cref="Page"/> was occupying.</remarks>
-        public void Dispose() => CloseAsync();
+        public void Dispose() => CloseAsync().Wait();
         #endregion
     }
 }
