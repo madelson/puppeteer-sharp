@@ -89,7 +89,6 @@ namespace PuppeteerSharp
                 }
                 finally
                 {
-                    IsClosed = true;
                     _closeCompletedTcs.TrySetResult(true);
                 }
             });
@@ -357,7 +356,7 @@ namespace PuppeteerSharp
         /// <summary>
         /// Get an indication that the page has been closed.
         /// </summary>
-        public bool IsClosed { get; private set; }
+        public bool IsClosed => _closeCompletedTcs.Task.IsCompleted;
 
         /// <summary>
         /// Gets the accessibility.
@@ -1295,13 +1294,16 @@ namespace PuppeteerSharp
                     return Client.SendAsync("Page.close");
                 }
 
-                return Client.Connection.SendAsync("Target.closeTarget", new TargetCloseTargetRequest
+                _ = Client.Connection.SendAsync("Target.closeTarget", new TargetCloseTargetRequest
                 {
                     TargetId = Target.TargetId
-                }).ContinueWith(task => Target.CloseTask);
+                });
+            }
+            else
+            {
+                _logger.LogWarning("Protocol error: Connection closed. Most likely the page has been closed.");
             }
 
-            _logger.LogWarning("Protocol error: Connection closed. Most likely the page has been closed.");
             return _closeCompletedTcs.Task;
         }
 
