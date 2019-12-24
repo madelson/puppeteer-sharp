@@ -110,11 +110,10 @@ namespace PuppeteerSharp.Tests.PageTests
         /// This test demonstrates that disposing the browser immediately closes it.
         /// </summary>
         [Fact]
-        public async Task DisposeShouldSynchronouslyClosePage()
+        public void DisposeShouldSynchronouslyClosePage()
         {
-            var page = await Context.NewPageAsync();
-            page.Dispose();
-            Assert.True(page.IsClosed);
+            Page.Dispose();
+            Assert.True(Page.IsClosed);
         }
 
         /// <summary>
@@ -125,14 +124,9 @@ namespace PuppeteerSharp.Tests.PageTests
         /// without hanging.
         /// </summary>
         [Fact]
-        public async Task ShouldBeAbleToSynchronouslyWaitOnCloseAsync()
-        {
-            using (var page = await Context.NewPageAsync())
-            {
-                // 10s should be MUCH longer than we need for close to finish, so we should only
-                // fail if the deadlock is actually encountered
-                Assert.True(page.CloseAsync().Wait(TimeSpan.FromSeconds(10)));
-            }
-        }
+        public void ShouldBeAbleToSynchronouslyWaitOnCloseAsync() =>
+            // 10s should be MUCH longer than we need for close to finish, so we should only
+            // fail if the deadlock is actually encountered
+            Assert.True(Page.CloseAsync().Wait(TimeSpan.FromSeconds(10)));
     }
 }
