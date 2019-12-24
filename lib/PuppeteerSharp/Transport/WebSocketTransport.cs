@@ -156,7 +156,7 @@ namespace PuppeteerSharp.Transport
         private async Task<object> GetResponseAsync(CancellationToken cancellationToken)
         {
             var buffer = new byte[2048];
-            var lastQueuedTask = Task.CompletedTask;
+            var lastQueuedTask = Task.CompletedTask; // state underlying QueueTask()
 
             while (!IsClosed)
             {
@@ -195,7 +195,7 @@ namespace PuppeteerSharp.Transport
                     }
                 }
 
-                QueueOrderedTask(
+                QueueTask(
                     (_, state) => MessageReceived?.Invoke(this, new MessageReceivedEventArgs(state.ToString())),
                     state: response
                 );
@@ -203,7 +203,11 @@ namespace PuppeteerSharp.Transport
 
             return null;
 
-            void QueueOrderedTask(Action<Task, object> action, object state) => lastQueuedTask = lastQueuedTask
+            // Queues the given action to run asynchronously, but still in order such that this task will not run
+            // until all previously-queued tasks have completed. Running asynchronously is important to avoid deadlocks;
+            // (happens when our event loop is blocked waiting for a handler to return and the handler is blocked waiting 
+            // for an event). Maintaining event order is important for correctness and thread-safety.
+            void QueueTask(Action<Task, object> action, object state) => lastQueuedTask = lastQueuedTask
                 .ContinueWith(action, state, CancellationToken.None, TaskContinuationOptions.RunContinuationsAsynchronously, TaskScheduler.Default);
         }
 

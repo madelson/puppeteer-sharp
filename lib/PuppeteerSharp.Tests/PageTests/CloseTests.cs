@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -101,6 +102,37 @@ namespace PuppeteerSharp.Tests.PageTests
         {
             Browser.Connection.Dispose();
             await Page.CloseAsync();
+        }
+
+        /// <summary>
+        /// Prior to addressing https://github.com/kblok/puppeteer-sharp/issues/1354, <see cref="Page.Dispose"/>
+        /// would "fire and forget", which meant that the page might not actually be closed upon completion.
+        /// This test demonstrates that disposing the browser immediately closes it.
+        /// </summary>
+        [Fact]
+        public async Task DisposeShouldSynchronouslyClosePage()
+        {
+            var page = await Context.NewPageAsync();
+            page.Dispose();
+            Assert.True(page.IsClosed);
+        }
+
+        /// <summary>
+        /// Prior to addressing https://github.com/kblok/puppeteer-sharp/issues/1354, waiting on
+        /// <see cref="Page.CloseAsync"/> could deadlock because the messages coming from 
+        /// chromium were processed synchronously in a way that blocked the event loop. This test
+        /// demonstrates that it is now possible to wait synchronously on <see cref="Page.CloseAsync"/>
+        /// without hanging.
+        /// </summary>
+        [Fact]
+        public async Task ShouldBeAbleToSynchronouslyWaitOnCloseAsync()
+        {
+            using (var page = await Context.NewPageAsync())
+            {
+                // 10s should be MUCH longer than we need for close to finish, so we should only
+                // fail if the deadlock is actually encountered
+                Assert.True(page.CloseAsync().Wait(TimeSpan.FromSeconds(10)));
+            }
         }
     }
 }
