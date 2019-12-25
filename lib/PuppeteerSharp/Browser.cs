@@ -410,7 +410,7 @@ namespace PuppeteerSharp
         {
             try
             {
-                await CloseAsync();
+                await CloseAsync().ConfigureAwait(false);
                 Disconnected?.Invoke(this, new EventArgs());
             }
             catch (Exception ex)
@@ -469,9 +469,26 @@ namespace PuppeteerSharp
             var target = TargetsMap[e.TargetId];
             TargetsMap.Remove(e.TargetId);
 
+            // if we are closing a target that has not been initialized, then we never fired TargetCreated
+            // so we don't want to fire TargetDestroyed (yet)
+            var isTargetInitialized = target.IsInitialized;
+            if (isTargetInitialized)
+            {
+                RaiseTargetDestroyed();
+            }
+
             target.CloseTaskWrapper.TrySetResult(true);
 
-            if (await target.InitializedTask.ConfigureAwait(false))
+            // if we didn't fire TargetDestroyed, schedule a continuation to do so in the event that
+            // we later initialize. However, this is still questionable because we will be firing
+            // TargetCreated and TargetDestroyed concurrently
+            if (!isTargetInitialized
+                && await target.InitializedTask.ConfigureAwait(false))
+            {
+                RaiseTargetDestroyed();
+            }
+
+            void RaiseTargetDestroyed()
             {
                 var args = new TargetChangedArgs { Target = target };
                 TargetDestroyed?.Invoke(this, args);
