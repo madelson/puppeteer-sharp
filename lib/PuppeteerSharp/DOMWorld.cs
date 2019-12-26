@@ -316,7 +316,7 @@ namespace PuppeteerSharp
                 throw new SelectorException($"No node found for selector: {selector}", selector);
             }
             var result = await handle.SelectAsync(values).ConfigureAwait(false);
-            await handle.DisposeAsync();
+            await handle.DisposeAsync().ConfigureAwait(false);
             return result;
         }
 
@@ -426,12 +426,15 @@ namespace PuppeteerSharp
                     options.Hidden
                 }).Task.ConfigureAwait(false);
 
-            if (!(handle is ElementHandle elementHandle))
+            if (handle is ElementHandle elementHandle)
             {
-                await handle?.DisposeAsync();
-                return null;
+                return elementHandle;
             }
-            return elementHandle;
+            if (handle != null)
+            {
+                await handle.DisposeAsync().ConfigureAwait(false);
+            }                
+            return null;
         }
     }
 }

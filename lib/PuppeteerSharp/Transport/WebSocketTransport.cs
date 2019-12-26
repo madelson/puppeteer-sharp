@@ -45,7 +45,7 @@ namespace PuppeteerSharp.Transport
         private static async Task<IConnectionTransport> CreateDefaultTransport(Uri url, IConnectionOptions connectionOptions, CancellationToken cancellationToken)
         {
             var webSocketFactory = connectionOptions.WebSocketFactory ?? DefaultWebSocketFactory;
-            var webSocket = await webSocketFactory(url, connectionOptions, cancellationToken);
+            var webSocket = await webSocketFactory(url, connectionOptions, cancellationToken).ConfigureAwait(false);
             return new WebSocketTransport(webSocket, DefaultTransportScheduler, connectionOptions.EnqueueTransportMessages);
         }
 

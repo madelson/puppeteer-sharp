@@ -401,7 +401,7 @@ namespace PuppeteerSharp
                 ObjectId = RemoteObject.ObjectId
             }).ConfigureAwait(false);
 
-            return string.IsNullOrEmpty(nodeInfo.Node.FrameId) ? null : await _frameManager.GetFrameAsync(nodeInfo.Node.FrameId);
+            return string.IsNullOrEmpty(nodeInfo.Node.FrameId) ? null : await _frameManager.GetFrameAsync(nodeInfo.Node.FrameId).ConfigureAwait(false);
         }
 
         /// <summary>

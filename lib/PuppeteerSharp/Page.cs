@@ -81,7 +81,7 @@ namespace PuppeteerSharp
 
             _screenshotTaskQueue = screenshotTaskQueue;
 
-            _ = target.CloseTask.ContinueWith((arg) =>
+            _ = target.CloseTask.ContinueWith(arg =>
             {
                 try
                 {
@@ -1639,9 +1639,9 @@ namespace PuppeteerSharp
 
             if (SessionClosedTask.IsFaulted)
             {
-                await SessionClosedTask;
+                await SessionClosedTask.ConfigureAwait(false);
             }
-            return await requestTcs.Task;
+            return await requestTcs.Task.ConfigureAwait(false);
         }
 
         /// <summary>
@@ -1695,9 +1695,9 @@ namespace PuppeteerSharp
 
             if (SessionClosedTask.IsFaulted)
             {
-                await SessionClosedTask;
+                await SessionClosedTask.ConfigureAwait(false);
             }
-            return await responseTcs.Task;
+            return await responseTcs.Task.ConfigureAwait(false);
         }
 
         /// <summary>

@@ -179,7 +179,7 @@ namespace PuppeteerSharp
 
         #region Private Methods
 
-        private async void Transport_MessageReceived(object sender, MessageReceivedEventArgs e) => await _callbackQueue.Enqueue(() => ProcessMessage(e));
+        private async void Transport_MessageReceived(object sender, MessageReceivedEventArgs e) => await _callbackQueue.Enqueue(() => ProcessMessage(e)).ConfigureAwait(false);
 
         private async Task ProcessMessage(MessageReceivedEventArgs e)
         {
@@ -285,7 +285,7 @@ namespace PuppeteerSharp
             if (transport == null)
             {
                 var transportFactory = connectionOptions.TransportFactory ?? WebSocketTransport.DefaultTransportFactory;
-                transport = await transportFactory(new Uri(url), connectionOptions, cancellationToken);
+                transport = await transportFactory(new Uri(url), connectionOptions, cancellationToken).ConfigureAwait(false);
             }
             return new Connection(url, connectionOptions.SlowMo, transport, loggerFactory);
         }
