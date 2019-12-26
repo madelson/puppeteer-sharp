@@ -104,17 +104,17 @@ namespace PuppeteerSharp.Tests.PageTests
             await Page.CloseAsync();
         }
 
-        /// <summary>
-        /// Prior to addressing https://github.com/kblok/puppeteer-sharp/issues/1354, <see cref="Page.Dispose"/>
-        /// would "fire and forget", which meant that the page might not actually be closed upon completion.
-        /// This test demonstrates that disposing the browser immediately closes it.
-        /// </summary>
-        [Fact]
-        public void DisposeShouldSynchronouslyClosePage()
-        {
-            Page.Dispose();
-            Assert.True(Page.IsClosed);
-        }
+        ///// <summary>
+        ///// Prior to addressing https://github.com/kblok/puppeteer-sharp/issues/1354, <see cref="Page.Dispose"/>
+        ///// would "fire and forget", which meant that the page might not actually be closed upon completion.
+        ///// This test demonstrates that disposing the browser immediately closes it.
+        ///// </summary>
+        //[Fact]
+        //public void DisposeShouldSynchronouslyClosePage()
+        //{
+        //    Page.Dispose();
+        //    Assert.True(Page.IsClosed);
+        //}
 
         /// <summary>
         /// Prior to addressing https://github.com/kblok/puppeteer-sharp/issues/1354, waiting on

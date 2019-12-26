@@ -34,18 +34,18 @@ namespace PuppeteerSharp.Tests.BrowserTests.Events
             }
         }
 
-        /// <summary>
-        /// Prior to addressing https://github.com/kblok/puppeteer-sharp/issues/1354, <see cref="Browser.Dispose"/>
-        /// would "fire and forget", which meant that the browser might not actually be closed upon completion.
-        /// This test demonstrates that disposing the browser immediately closes it.
-        /// </summary>
-        [Fact]
-        public async Task DisposeShouldSynchronouslyCloseBrowser()
-        {
-            var browser = await Puppeteer.LaunchAsync(TestConstants.DefaultBrowserOptions());
-            browser.Dispose();
-            Assert.True(browser.IsClosed);
-        }
+        ///// <summary>
+        ///// Prior to addressing https://github.com/kblok/puppeteer-sharp/issues/1354, <see cref="Browser.Dispose"/>
+        ///// would "fire and forget", which meant that the browser might not actually be closed upon completion.
+        ///// This test demonstrates that disposing the browser immediately closes it.
+        ///// </summary>
+        //[Fact]
+        //public async Task DisposeShouldSynchronouslyCloseBrowser()
+        //{
+        //    var browser = await Puppeteer.LaunchAsync(TestConstants.DefaultBrowserOptions());
+        //    browser.Dispose();
+        //    Assert.True(browser.IsClosed);
+        //}
 
         /// <summary>
         /// Prior to addressing https://github.com/kblok/puppeteer-sharp/issues/1354, waiting on
